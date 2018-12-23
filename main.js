@@ -5,6 +5,7 @@
             this.list = [];
             this.num = 0;
             this.lastAdd;
+            this.divisions = {};
         }
 
         add(Note){
@@ -12,6 +13,13 @@
             this.list.push(Note);
             this.num++;
             this.lastAdd = Note;
+
+            if(this.divisions[Note.division]===undefined){
+                this.divisions[Note.division] = [];
+                this.divisions[Note.division].push(Note.id);
+            }else{
+                this.divisions[Note.division].push(Note.id);
+            }
         }
     }
     
@@ -31,7 +39,7 @@
 
     //1. add note
     //* date format function
-    function dateToStr24H(date, format) {
+    function dateToStr(date=new Date(), format) {
         if (!format) {
             format = 'Y/M/D h:m:s';
         }
@@ -46,14 +54,14 @@
 
     document.getElementById("add-button").addEventListener("click", function(){
         var string = $("#add-string").val();
-        var date = dateToStr24H(new Date);   
+        var date = dateToStr(new Date);   
         //var division = $("#add_division option:selected").text();
         var add_division = document.getElementById("add-division");
         var i = add_division.selectedIndex;
         var division = add_division.options[i].text;
         notes.add(new Note(string, date, division, Date.now()));
-        console.log(notes.lastAdd);
         appendNote(notes.lastAdd);
+        console.log(notes.lastAdd);
     }, false);
 
 
@@ -62,8 +70,91 @@
     function appendNote(Note){
         var date = Note.date;
         var string = Note.string;
-        $("#field").append("<p class=\"field-content\"><span class=\"time\">"+date+"</span><span class=\"note\">"+string+"</span>");
+        var division = Note.division;
+        $("#field").append(
+            "<p class=\"field-content\">"
+            +"<span class=\"time\">"+date
+            +"</span><span class=\"note\">"+string+"</span>"
+            +"</span><span class=\"division\">["+division+"]</span>"
+        );
+
+        generateNavigations(notes);
     }
 
+
+    //2.5. Displaying setting class
+    class Display{
+        constructor(date, type, division){
+            this.date = date;
+            this.type = type;
+            this.division = division;
+            this.displayedDivisions = {};
+        }
+    }
+    var display = new Display(dateToStr(), "Weekly", "diary");
+
     //3. click events
+    function refresh(){
+        $("#field").empty();
+    }
+
+    function generateFieldTitle(date, type){
+        $("#field").append("<p class=\"field-title\"><span class=\"insight-date\">"+date+"</span><span class=\"insight-type\">:"+type+" Insight</span></p>");
+    }
+
+    function generateFieldContent(date, string, division){
+        $("#field").append(
+            "<p class=\"field-content\">"
+            +"<span class=\"time\">"+date
+            +"</span><span class=\"note\">"+string+"</span>"
+            +"</span><span class=\"division\">"+division+"</span>"
+        );
+    }
+
+    function generate(){
+        return;
+    }
+
+
+    //4. generate navigation from Notes
+    function generateNavigation(date, type, division){
+        if(date!=null){
+            //$("#navi-type").append("<a onclick=\"display.date="+date+"\"></a>");
+        }
+        if(type!=null){
+            $("#navi-type").append("<li><a onclick=\"display.type="+type+"\">"+type+"</a></li>");
+        }
+        if(division!=null){
+            var dom = $("<li><a href='#'"+division+"</a>"+division+"</li>");
+            dom.click(function(){
+                display.division = division;
+            });
+            $("#navi-division").append(dom);
+        }
+    }
+
+    var a = 0;
+    document.getElementById("debug").addEventListener("click", function(n){
+        a = n;
+        console.log(a);
+        console.log(display);
+    })
+
+    function generateNavigations(Notes){
+        $("#navi-division").empty();
+        display.displayedDivisions = {};
+        for(var d in Notes.divisions){
+            var dis = display.displayedDivisions[d];
+            if(dis === undefined){
+                display.displayedDivisions[d] = 1;
+                generateNavigation(null, null, d);
+            }
+            else{
+                display.displayedDivisions[d]++;
+            }
+        }
+    }
+
+    //change field view by clicking the navigation
+
 })();

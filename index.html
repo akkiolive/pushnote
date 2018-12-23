@@ -9,6 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
+    <button id="debug">debug</button>
     <h1><a href="#top">pushnote</a></h1>
     <div id="wrapper">
         <div id="add-note">
@@ -23,7 +24,7 @@
         <div id="navigation">
             <p class="navi-content">
                 <p class="navi-title">navi</p>
-                <ul>
+                <ul id="navi-type">
                     <li><a href="#">month</a></li>
                     <li><a href="#">week</a></li>
                     <li><a href="#">day</a></li>
@@ -32,7 +33,7 @@
 
             <p class="navi-content">
                 <p class="navi-title">division</p>
-                <ul>
+                <ul id="navi-division">
                     <li><a href="#">app ideas</a></li>
                     <li><a href="#">diary</a></li>
                     <li><a href="#">things I feel good</a></li>
@@ -45,15 +46,17 @@
             <p class="field-content">
                 <span class="time">2018/12/19 8:01:29</span>
                 <span class="note">I woke up.</span>
-                <span class="division">diary</span>
+                <span class="division">[diary]</span>
             </p>
             <p class="field-content">
                 <span class="time">2018/12/19 8:11:09</span>
                 <span class="note">I washed my face.</span>
+                <span class="division">[things I feel good]</span>
             </p>
             <p class="field-content">
                 <span class="time">2018/12/19 8:41:21</span>
                 <span class="note">I started up my PC.</span>
+                <span class="division">[app ideas]</span>
             </p>
         </div>
     </div>
