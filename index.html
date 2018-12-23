@@ -11,11 +11,49 @@
 <body>
     <h1><a href="#top">pushnote</a></h1>
     <div id="wrapper">
-        <div id="navigation"></div>
+        <div id="addnote">
+            <textarea placeholder="write note here"></textarea><br />
+            <select name="tag-select">
+                <option value="s1">app ideas</option>
+                <option value="s1">diary</option>
+                <option value="s1">things I feel good</option>
+            </select>
+            <button>add note</button>
+        </div>
+        <div id="navigation">
+            <p class="navi-content">
+                <p class="navi-title">navi</p>
+                <ul>
+                    <li><a href="#">month</a></li>
+                    <li><a href="#">week</a></li>
+                    <li><a href="#">day</a></li>
+                </ul>
+            </p>
+
+            <p class="navi-content">
+                <p class="navi-title">division</p>
+                <ul>
+                    <li><a href="#">app ideas</a></li>
+                    <li><a href="#">diary</a></li>
+                    <li><a href="#">things I feel good</a></li>
+                </ul>
+            </p>
+        </div>
 
         <div id="field">
-            <span class="time"></span>
-            <span class="note"></span>
+            <p class="field-title"><span class="insight-date">2018/12/19</span><span class="insight-type">:Daily Insight</span></p>
+            <p class="field-content">
+                <span class="time">2018/12/19 8:01:29</span>
+                <span class="note">I woke up.</span>
+            </p>
+            <p class="field-content">
+                <span class="time">2018/12/19 8:11:09</span>
+                <span class="note">I washed my face.</span>
+            </p>
+            <p class="field-content">
+                <span class="time">2018/12/19 8:41:21</span>
+                <span class="note">I started up my PC.</span>
+            </p>
         </div>
     </div>
 </body>
