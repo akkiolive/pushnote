@@ -16,16 +16,16 @@ h1 a {
     text-decoration: none;
 }
 
-#addnote{
+#add-note{
     margin: 5px;
-    display: none;
+    //display: none;
 }
 
-#addnote{
+#add-note{
     padding: 0px 10px 10px 10px;
     text-align: left;
 }
-#addnote textarea{
+#add-note textarea{
     width: 40%;
     height: 5em;
 }
@@ -75,4 +75,8 @@ h1 a {
     margin-right: 1em;
 }
 
+.field-content .division{
+    display: inline;
+    text-align: right;
+}
 

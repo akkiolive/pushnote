@@ -6,19 +6,19 @@
     <title>pushnote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
-    <script src="main.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
     <h1><a href="#top">pushnote</a></h1>
     <div id="wrapper">
-        <div id="addnote">
-            <textarea placeholder="write note here"></textarea><br />
-            <select name="tag-select">
+        <div id="add-note">
+            <textarea id="add-string" placeholder="write note here"></textarea><br />
+            <select id="add-division">
                 <option value="s1">app ideas</option>
-                <option value="s1">diary</option>
-                <option value="s1">things I feel good</option>
+                <option value="s2">diary</option>
+                <option value="s3">things I feel good</option>
             </select>
-            <button>add note</button>
+            <button id="add-button">add note</button>
         </div>
         <div id="navigation">
             <p class="navi-content">
@@ -45,6 +45,7 @@
             <p class="field-content">
                 <span class="time">2018/12/19 8:01:29</span>
                 <span class="note">I woke up.</span>
+                <span class="division">diary</span>
             </p>
             <p class="field-content">
                 <span class="time">2018/12/19 8:11:09</span>
@@ -56,5 +57,8 @@
             </p>
         </div>
     </div>
+
+    <script src="main.js"></script>
+
 </body>
 </html>
