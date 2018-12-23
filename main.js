@@ -1,4 +1,4 @@
-(function(){
+﻿(function(){
     //0. make class
     class Notes{
         constructor(){
@@ -20,6 +20,7 @@
             }else{
                 this.divisions[Note.division].push(Note.id);
             }
+            writeJson(this);
         }
     }
     
@@ -34,7 +35,6 @@
             this.id = -1;
         }
     }
-
     var notes = new Notes();
 
     //1. add note
@@ -62,6 +62,8 @@
         notes.add(new Note(string, date, division, Date.now()));
         appendNote(notes.lastAdd);
         console.log(notes.lastAdd);
+
+        document.getElementById("add-string").value = "";
     }, false);
 
 
@@ -86,6 +88,8 @@
     class Display{
         constructor(date, type, division){
             this.date = date;
+            this.startDay;
+            this.endDay;
             this.type = type;
             this.division = division;
             this.displayedDivisions = {};
@@ -98,7 +102,9 @@
         $("#field").empty();
     }
 
-    function generateFieldTitle(date, type){
+    function generateFieldTitle(display){
+        var date = display.date;
+        var type = display.type;
         $("#field").append("<p class=\"field-title\"><span class=\"insight-date\">"+date+"</span><span class=\"insight-type\">:"+type+" Insight</span></p>");
     }
 
@@ -128,6 +134,7 @@
             var dom = $("<li><a href='#'"+division+"</a>"+division+"</li>");
             dom.click(function(){
                 display.division = division;
+                changeFiledView(display);
             });
             $("#navi-division").append(dom);
         }
@@ -155,6 +162,69 @@
         }
     }
 
-    //change field view by clicking the navigation
+    //5. change field view by clicking the navigation
+    function changeFiledView(display){
+        $("#field").empty();
+        generateFieldTitle(display);
+        var toDisplay = [];
+        for(var n of notes.list){
+            var flag = 0;
+            //filter by date    
 
+            //filter by division
+            if(n.division === display.division){
+                flag = 1;
+            }
+            else{
+                flag = 0;
+            }
+
+            if(flag){
+                appendNote(n);
+            }
+        }
+    }
+
+    //6. server access loading
+    function getJson(urlIn) {
+        $.ajax({ // json読み込み開始
+            type: 'GET',
+            url: urlIn,
+            dataType: 'json'
+        })
+        .then(
+            function(json) { // jsonの読み込みに成功した時
+                var l = json.list;
+                for(var i in l){
+                    notes.add(l[i]);
+                }
+                writeJson(notes);
+            },
+            function() { //jsonの読み込みに失敗した時
+                console.log('失敗');
+            }
+        );
+    }
+
+    function writeJson(notes){
+        var text = JSON.stringify(notes);
+        //ajax送信
+        $.ajax({
+            url : "ajax.php",
+            type : "POST",
+            dataType:"text",
+            data : {"text": text},
+            error : function(XMLHttpRequest, textStatus, errorThrown) {
+                console.log("ajax通信に失敗しました");
+            },
+            success : function(response) {
+                console.log("ajax通信に成功しました");
+                //console.log(response[0]);
+                //console.log(response[1]);
+            }
+        });
+    }
+
+    getJson("notes.json");
+    
 })();
