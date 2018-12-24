@@ -61,7 +61,7 @@
         var division = add_division.options[i].text;
         notes.add(new Note(string, date, division, Date.now()));
         appendNote(notes.lastAdd);
-        console.log(notes.lastAdd);
+        console.log(notes);
 
         document.getElementById("add-string").value = "";
     }, false);
@@ -73,12 +73,46 @@
         var date = Note.date;
         var string = Note.string;
         var division = Note.division;
-        $("#field").append(
-            "<p class=\"field-content\">"
-            +"<span class=\"time\">"+date
-            +"</span><span class=\"note\">"+string+"</span>"
-            +"</span><span class=\"division\">["+division+"]</span>"
+        var mc = $("#main-content");
+        var fc = $(
+            "<li class=\"field-content\">"
+            +"<div class=\"time\">"+date
+            +"</div><div class=\"note\">"+string+"</div>"
+            +"</div><div class=\"division\">["+division+"]</div>"
+            +'<br /><div class="content-control" style="visibility:hidden"></div>'
+            +"</li>"
         );
+        mc.append(fc);
+        
+        var edit = $('<a>', {href: "#", text: "Edit"});
+        edit.click(function(){
+            return; //TODO
+        });
+        var del = $('<a>', {href: "#", text: "Delete"});
+        del.click(function(){
+            console.log(notes);
+            console.log(Note);
+            for(var i in notes.list){
+                if(notes.list[i].postTime === Note.postTime){
+                    notes.list.splice(i, 1);
+                    writeJson(notes);
+                    console.log(notes.list[i]);
+                }
+            }
+            refresh();
+            return; //TODO
+        });
+
+        var cc = fc.children(".content-control")
+        cc.append(edit);
+        cc.append(del);
+
+        fc.hover(function(){
+            cc.css("visibility", "visible");
+        },
+        function(){
+            cc.css("visibility", "hidden");
+        });
 
         generateNavigations(notes);
     }
@@ -87,33 +121,40 @@
     //2.5. Displaying setting class
     class Display{
         constructor(date, type, division){
-            this.date = date;
-            this.startDay;
-            this.endDay;
+            this.start = new Date(1970, 1, 1);
+            this.end = new Date(2100, 1, 1);
+            var start = dateToStr(start, "Y/M/D");
+            var end = dateToStr(end, "Y/M/D");
+            this.data = start + " - " + end;
             this.type = type;
             this.division = division;
             this.displayedDivisions = {};
         }
     }
-    var display = new Display(dateToStr(), "Weekly", "diary");
+    var display = new Display(dateToStr(), "all", "app ideas");
 
     //3. click events
     function refresh(){
         $("#field").empty();
+        changeFiledView(display);
     }
 
     function generateFieldTitle(display){
-        var date = display.date;
-        var type = display.type;
-        $("#field").append("<p class=\"field-title\"><span class=\"insight-date\">"+date+"</span><span class=\"insight-type\">:"+type+" Insight</span></p>");
+        var start = dateToStr(display.start, "Y/M/D");
+        var end = dateToStr(display.end, "Y/M/D");
+        var date = "";
+        if(start === end) date = start;
+        //else if(start.split('/')[0] === "1970") date = "All period"
+        else if(display.type === "all") date = "All period";
+        else date = start + " - " + end;
+        var type = display.division;
+        if(display.type === "all") type = "ALL"
+        $("#field").append("<p class=\"field-title\"><span class=\"insight-date\">"+date+"</span><span class=\"insight-type\">:"+type+"</span></p>");
     }
 
     function generateFieldContent(date, string, division){
         $("#field").append(
-            "<p class=\"field-content\">"
-            +"<span class=\"time\">"+date
-            +"</span><span class=\"note\">"+string+"</span>"
-            +"</span><span class=\"division\">"+division+"</span>"
+            "<ul class='field-content' id='main-content'></ul>"
         );
     }
 
@@ -166,20 +207,37 @@
     function changeFiledView(display){
         $("#field").empty();
         generateFieldTitle(display);
+        generateFieldContent();
         var toDisplay = [];
         for(var n of notes.list){
-            var flag = 0;
+            if(n === null) continue;
+            var flag = 1;
             //filter by date    
-
-            //filter by division
-            if(n.division === display.division){
-                flag = 1;
+            var p = Date.parse(n.date);
+            var s = Date.parse(display.start);
+            var e = Date.parse(display.end);
+            if(s<=p && p<=e){
+                console.log(s);
+                console.log(p);
+                console.log(e);
+                flag = flag;
             }
             else{
                 flag = 0;
             }
 
+            //filter by division
+            if(display.type != "all"){
+                if(n.division === display.division){
+                    flag = flag;
+                }
+                else{
+                    flag = 0;
+                }
+            }
+
             if(flag){
+                toDisplay.push(n);
                 appendNote(n);
             }
         }
@@ -199,9 +257,10 @@
                     notes.add(l[i]);
                 }
                 writeJson(notes);
+                refresh();
             },
             function() { //jsonの読み込みに失敗した時
-                console.log('失敗');
+                console.log('読み込み失敗');
             }
         );
     }
@@ -215,16 +274,28 @@
             dataType:"text",
             data : {"text": text},
             error : function(XMLHttpRequest, textStatus, errorThrown) {
-                console.log("ajax通信に失敗しました");
+                console.log("書き込みに失敗しました");
             },
             success : function(response) {
-                console.log("ajax通信に成功しました");
+                console.log("書き込みに成功しました");
                 //console.log(response[0]);
                 //console.log(response[1]);
             }
         });
     }
 
-    getJson("notes.json");
+    getJson("userdata/notes.json");
+
+    //note control actions
+    var content_string = document.getElementsByClassName("string");
+    var content_controls = document.getElementsByClassName("content-control");
+    for(var c of content_string){
+        c.addEventListener('mouseenter', () =>{
+            c.style.visibility = "visible";
+        }, false);
+        c.addEventListener('mouseleave', () =>{
+            c.style.visibility = "hidden";
+        }, false);
+    }
     
 })();

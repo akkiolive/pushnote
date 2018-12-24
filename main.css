@@ -70,17 +70,37 @@ h1{
 }
 
 .field-content{
-    margin-left: 4em;
+    display: list-item;
+    list-style-type: none;
+    padding: 10px;
+    margin: 5px;
+}
+
+.field-content .note{
+    display: inline-block;
+    vertical-align: top;
+}
+.field-content .content-control{
+    text-align: right;
+    font-size: small;
+}
+.field-content .content-control a{
+    color: #90cc00;
+    margin: 0 0.5em;
 }
 
 .field-content .time{
     color: #aaaaaa;
     margin-right: 1em;
+    display: inline-block;
+    vertical-align: top;
 }
 
 .field-content .division{
     text-align: right;
     float: right;
-    color: #aaaaaa
+    color: #aaaaaa;
+    display: inline-block;
+    vertical-align: top;
 }
 
