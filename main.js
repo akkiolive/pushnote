@@ -284,7 +284,7 @@
         });
     }
 
-    getJson("userdata/notes.json");
+    getJson("getJson.php");
 
     //note control actions
     var content_string = document.getElementsByClassName("string");
