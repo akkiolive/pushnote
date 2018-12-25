@@ -134,6 +134,49 @@
             this.division = division;
             this.displayedDivisions = {};
         }
+
+        setDisplayTime(){
+            this.end = new Date();
+            this.start = new Date();
+            if(this.typePeriod === "year"){
+                this.start.setMonth(0);
+                this.start.setDate(1);
+                this.start.setHours(0);
+                this.start.setMinutes(0);
+                this.start.setSeconds(0);
+                this.end.setMonth(12);
+                this.end.setDate(1);
+                this.end.setHours(0);
+                this.end.setMinutes(0);
+                this.end.setSeconds(0);            }
+            else if(this.typePeriod === "month"){
+                this.start.setDate(1);
+                this.start.setHours(0);
+                this.start.setMinutes(0);
+                this.start.setSeconds(0);
+                this.end.setMonth(this.end.getMonth()+1);
+                this.end.setDate(0);
+                this.end.setHours(0);
+                this.end.setMinutes(0);
+                this.end.setSeconds(0);            
+            }
+            else if(this.typePeriod === "day"){
+                this.start.setHours(0);
+                this.start.setMinutes(0);
+                this.start.setSeconds(0);
+                this.end.setHours(23);
+                this.end.setMinutes(59);
+                this.end.setSeconds(59);
+            }
+            else if(this.typePeriod === "hour"){
+                this.start.setHours(this.end.getHours() - 1);
+            }
+            else if(this.typePeriod === "minute"){
+                this.start.setMinutes(this.end.getMinutes() - 1);
+            }
+            console.log(this.start);
+            console.log(this.end);
+        }
     }
     var display = new Display(dateToStr(), "all", "app ideas");
 
@@ -143,6 +186,7 @@
         changeFiledView(display);
         generateDivisionButtons(notes);
         generateDivisionSelectOptions(notes);
+        generatePeriodNavigation();
     }
 
     function generateFieldTitle(display){
@@ -151,11 +195,15 @@
         var end = dateToStr(display.end, "Y/M/D");
         var date = "";
         if(start === end) date = start;
-        //else if(start.split('/')[0] === "1970") date = "All period"
-        else if(display.typePeriod === "all" || startYear==="1970") date = "All period";
+        if(display.typePeriod === "all" || startYear==="1970") date = "All period";
+        else if(display.typePeriod === "year") date = startYear+"/1/1 - "+startYear+"/12/31";
+        else if(display.typePeriod === "day") date = start;
+        else if(display.typePeriod === "hour") date = "last 1 hour";
+        else if(display.typePeriod === "minute") date = "last 1 minute";
         else date = start + " - " + end;
         var type = display.division;
         if(display.typeDivision === "all") typeDivision = "ALL" 
+        else typeDivision = display.division;
         $("#field").append("<p class=\"field-title\"><span class=\"insight-type\">"+typeDivision+"</span><span class=\"insight-date\">:"+date+"</span></p>");
     }
 
@@ -186,7 +234,7 @@
                     display.typeDivision = "all";
                 }
                 else{
-                    display.typeDivision = "division";    
+                    display.typeDivision = "division";  
                 }
                 changeFiledView(display);
             });
@@ -236,32 +284,47 @@
     }
 
     function setAddDivision(division){
-        console.log(division);
-       $("#add-division").val(division);
+        $("#add-division").val(division);
         $('#add-division').trigger('change');
-         /*
-        var opt = $("#add-division").children("option");
-        opt.each(function(i, v){
-            if(opt[i].text === division){
-                console.log(i);
-                $("#add-division").val(opt[i].value);
-            }
-        });
-        */
     }
 
-    document.getElementById("push-division-button").addEventListener('click', 
-        function(){
-            var text = document.getElementById("push-division").value;
-            if(text==="") return;
-            if(!notes.divisions[text]){
-                notes.divisions[text] = [];
-                pushDivisionToOption(text);
-            }
-            $("#add-division").val(text);
-            $('#add-division').trigger('change');
-        }, false
-    );
+    function addDivisionFromInput(){
+        var text = document.getElementById("push-division-text").value;
+        if(text==="") return;
+        if(!notes.divisions[text]){
+            notes.divisions[text] = [];
+            pushDivisionToOption(text);
+        }
+        $("#add-division").val(text);
+        $('#add-division').trigger('change');
+        document.getElementById("push-division-text").value = "";
+    }
+
+    document.getElementById("push-division-text").addEventListener('keydown', function(e){
+        if(e.keyCode != 13) return; //enter key
+        addDivisionFromInput();
+    }, false);
+
+    function addPeriodNavigation(text, period){
+        var li = $("<li><a href='#'>"+text+"</a></li>");
+        li.click(function(){
+            display.typePeriod = period;
+            display.setDisplayTime();
+            changeFiledView(display);
+        });
+        $("#navi-period").append(li);
+    }
+
+    function generatePeriodNavigation(){
+        $("#navi-period").empty();
+        addPeriodNavigation("all", "all");
+        addPeriodNavigation("year", "year");
+        addPeriodNavigation("month", "month");
+        addPeriodNavigation("day", "day");
+        addPeriodNavigation("hour", "hour");
+        addPeriodNavigation("minute", "minute");
+        addPeriodNavigation("custom", "custom");    
+    }
 
     var a = 0;
     document.getElementById("debug").addEventListener("click", function(n){
@@ -288,13 +351,13 @@
                 var s = Date.parse(display.start);
                 var e = Date.parse(display.end);
                 if(s<=p && p<=e){
-                    //console.log(s);
-                    //console.log(p);
-                    //console.log(e);
                     flag = flag;
                 }
                 else{
                     flag = 0;
+                    console.log(s);
+                    console.log(p);
+                    console.log(e);
                 }
             }
 
@@ -331,7 +394,7 @@
                 for(var i in l){
                     notes.add(l[i]);
                 }
-                writeJson(notes);
+                //writeJson(notes);
                 refresh();
             },
             function() { //jsonの読み込みに失敗した時
