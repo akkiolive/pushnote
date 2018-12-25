@@ -52,6 +52,8 @@
         return format;
     } 
 
+    $("#add-division").select2();
+
     document.getElementById("add-button").addEventListener("click", function(){
         var string = $("#add-string").val();
         var date = dateToStr(new Date);   
@@ -67,7 +69,7 @@
     }, false);
 
 
-    //2. display note rom data
+    //2. display note from data
     //$("#field").append("<p class=\"field-content\"><span class=\"time\">"+);
     function appendNote(Note){
         var date = Note.date;
@@ -137,6 +139,8 @@
     function refresh(){
         $("#field").empty();
         changeFiledView(display);
+        generateDivisionButtons(notes);
+        generateDivisionSelectOptions(notes);
     }
 
     function generateFieldTitle(display){
@@ -181,13 +185,6 @@
         }
     }
 
-    var a = 0;
-    document.getElementById("debug").addEventListener("click", function(n){
-        a = n;
-        console.log(a);
-        console.log(display);
-    })
-
     function generateNavigations(Notes){
         $("#navi-division").empty();
         display.displayedDivisions = {};
@@ -202,6 +199,63 @@
             }
         }
     }
+
+    function generateDivisionButtons(notes){
+        $("#division-select-buttons").empty();
+        for(var d in notes.divisions){   
+            var btn = $("<button class='division-select-button'>"+d+"</button>")
+            btn.click(function(){
+                setAddDivision(d);
+            });
+            $("#division-select-buttons").append(btn);
+        }
+    }
+
+    function pushDivisionToOption(division){
+        $("#add-division").append("<option value='"+division+"'>"+division+"</option>");    
+    }
+
+    function generateDivisionSelectOptions(notes){
+        $("#add-division").empty();
+        for(var d in notes.divisions){
+            pushDivisionToOption(d);
+        }
+    }
+
+    function setAddDivision(division){
+        console.log(division);
+       $("#add-division").val(division);
+        $('#add-division').trigger('change');
+         /*
+        var opt = $("#add-division").children("option");
+        opt.each(function(i, v){
+            if(opt[i].text === division){
+                console.log(i);
+                $("#add-division").val(opt[i].value);
+            }
+        });
+        */
+    }
+
+    document.getElementById("push-division-button").addEventListener('click', 
+        function(){
+            var text = document.getElementById("push-division").value;
+            if(text==="") return;
+            if(!notes.divisions[text]){
+                notes.divisions[text] = [];
+                pushDivisionToOption(text);
+            }
+            $("#add-division").val(text);
+            $('#add-division').trigger('change');
+        }, false
+    );
+
+    var a = 0;
+    document.getElementById("debug").addEventListener("click", function(n){
+        a = n;
+        console.log(a);
+        console.log(display);
+    })
 
     //5. change field view by clicking the navigation
     function changeFiledView(display){
