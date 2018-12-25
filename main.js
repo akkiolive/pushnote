@@ -127,8 +127,10 @@
             this.end = new Date(2100, 1, 1);
             var start = dateToStr(start, "Y/M/D");
             var end = dateToStr(end, "Y/M/D");
-            this.data = start + " - " + end;
+            this.date = start + " - " + end;
             this.type = type;
+            this.typeDivision = "all"; //decide displaying all or each division
+            this.typePeriod = "all"; //decide displaying period
             this.division = division;
             this.displayedDivisions = {};
         }
@@ -145,15 +147,16 @@
 
     function generateFieldTitle(display){
         var start = dateToStr(display.start, "Y/M/D");
+        var startYear = dateToStr(display.start, "Y");
         var end = dateToStr(display.end, "Y/M/D");
         var date = "";
         if(start === end) date = start;
         //else if(start.split('/')[0] === "1970") date = "All period"
-        else if(display.type === "all") date = "All period";
+        else if(display.typePeriod === "all" || startYear==="1970") date = "All period";
         else date = start + " - " + end;
         var type = display.division;
-        if(display.type === "all") type = "ALL"
-        $("#field").append("<p class=\"field-title\"><span class=\"insight-date\">"+date+"</span><span class=\"insight-type\">:"+type+"</span></p>");
+        if(display.typeDivision === "all") typeDivision = "ALL" 
+        $("#field").append("<p class=\"field-title\"><span class=\"insight-type\">"+typeDivision+"</span><span class=\"insight-date\">:"+date+"</span></p>");
     }
 
     function generateFieldContent(date, string, division){
@@ -179,6 +182,12 @@
             var dom = $("<li><a href='#'"+division+"</a>"+division+"</li>");
             dom.click(function(){
                 display.division = division;
+                if(division === "all"){
+                    display.typeDivision = "all";
+                }
+                else{
+                    display.typeDivision = "division";    
+                }
                 changeFiledView(display);
             });
             $("#navi-division").append(dom);
@@ -187,6 +196,10 @@
 
     function generateNavigations(Notes){
         $("#navi-division").empty();
+        //link to all
+
+
+        //each
         display.displayedDivisions = {};
         for(var d in Notes.divisions){
             var dis = display.displayedDivisions[d];
@@ -267,21 +280,26 @@
             if(n === null) continue;
             var flag = 1;
             //filter by date    
-            var p = Date.parse(n.date);
-            var s = Date.parse(display.start);
-            var e = Date.parse(display.end);
-            if(s<=p && p<=e){
-                console.log(s);
-                console.log(p);
-                console.log(e);
+            if(display.typePeriod === "all"){
                 flag = flag;
             }
             else{
-                flag = 0;
+                var p = Date.parse(n.date);
+                var s = Date.parse(display.start);
+                var e = Date.parse(display.end);
+                if(s<=p && p<=e){
+                    //console.log(s);
+                    //console.log(p);
+                    //console.log(e);
+                    flag = flag;
+                }
+                else{
+                    flag = 0;
+                }
             }
 
             //filter by division
-            if(display.type != "all"){
+            if(display.typeDivision != "all"){
                 if(n.division === display.division){
                     flag = flag;
                 }
@@ -292,8 +310,11 @@
 
             if(flag){
                 toDisplay.push(n);
-                appendNote(n);
             }
+        }
+
+        for(var i in toDisplay){
+            appendNote(toDisplay[i]);
         }
     }
 

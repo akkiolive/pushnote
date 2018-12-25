@@ -21,7 +21,7 @@ h1{
 
 #add-note{
     margin: 5px;
-    //display: none;
+    /*display: none;*/
 }
 
 #add-note{
@@ -76,11 +76,11 @@ h1{
     font-weight: bold;
 }
 
-.insight-date{
+.insight-type{
     font-size: large;
 }
 
-.insight-type{
+.insight-date{
     font-size: medium;
     color: gray;
     margin-left: 5px;
