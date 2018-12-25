@@ -62,7 +62,8 @@
         var i = add_division.selectedIndex;
         var division = add_division.options[i].text;
         notes.add(new Note(string, date, division, Date.now()));
-        appendNote(notes.lastAdd);
+        //appendNote(notes.lastAdd);
+        refresh();
         console.log(notes);
 
         document.getElementById("add-string").value = "";
@@ -138,6 +139,7 @@
             this.typePeriod = "all"; //decide displaying period
             this.division = division;
             this.displayedDivisions = {};
+            this.sort  = "newest";
         }
 
         setDisplayTime(){
@@ -179,8 +181,8 @@
             else if(this.typePeriod === "minute"){
                 this.start.setMinutes(this.end.getMinutes() - 1);
             }
-            console.log(this.start);
-            console.log(this.end);
+            //console.log(this.start);
+            //console.log(this.end);
         }
     }
     var display = new Display(dateToStr(), "all", "app ideas");
@@ -188,6 +190,7 @@
     //3. click events
     function refresh(){
         $("#field").empty();
+        display.setDisplayTime();
         changeFiledView(display);
         generateDivisionButtons(notes);
         generateDivisionSelectOptions(notes);
@@ -269,7 +272,7 @@
     function generateDivisionButtons(notes){
         $("#division-select-buttons").empty();
         for(var d in notes.divisions){   
-            var btn = $("<button class='division-select-button'>"+d+"</button>")
+            var btn = $("<button class='division-select-button square_btn'>"+d+"</button>")
             btn.click(function(){
                 setAddDivision(d);
             });
@@ -360,9 +363,9 @@
                 }
                 else{
                     flag = 0;
-                    console.log(s);
-                    console.log(p);
-                    console.log(e);
+                    //console.log(s);
+                    //console.log(p);
+                    //console.log(e);
                 }
             }
 
@@ -379,6 +382,38 @@
             if(flag){
                 toDisplay.push(n);
             }
+        }
+
+        //sort
+        var dict = {};
+        for(var i in toDisplay){
+            dict[i] = toDisplay[i].postTime;
+        }
+        function object_array_sort(data,key,order,fn){
+            //デフォは降順(DESC)
+            var num_a = -1;
+            var num_b = 1;
+        
+            if(order === 'asc'){//指定があれば昇順(ASC)
+              num_a = 1;
+              num_b = -1;
+            }
+        
+           data = data.sort(function(a, b){
+              var x = a[key];
+              var y = b[key];
+              if (x > y) return num_a;
+              if (x < y) return num_b;
+              return 0;
+            });
+        
+           fn(data); // ソート後の配列を返す
+          }
+        if(display.sort === "newest"){
+            object_array_sort(toDisplay, 'id', '', function(new_data){
+                //ソート後の処理
+            //    console.log(new_data); //
+            }); 
         }
 
         for(var i in toDisplay){
@@ -440,5 +475,8 @@
             c.style.visibility = "hidden";
         }, false);
     }
+
+    //interval
+    setInterval(refresh, 1000);
     
 })();
