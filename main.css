@@ -19,6 +19,28 @@ h1{
     background: #c6ff00;
 }
 
+.square_btn {
+    display: inline-block;
+    padding: 0.3em 1em;
+    margin: 3px;
+    text-decoration: none;
+    color: #607a00;
+    border: solid 2px #c6ff00;
+    background: white;
+    border-radius: 3px;
+    transition: .0s;
+}
+
+.square_btn:hover {
+    background: #c6ff00;
+}
+
+#add-button{
+    border: #607a00 1px solid;
+    //font-size: 110%;
+    //padding: 1em 1em;
+}
+
 #add-note{
     margin: 5px;
     /*display: none;*/

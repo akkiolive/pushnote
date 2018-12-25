@@ -52,15 +52,17 @@
         return format;
     } 
 
-    $("#add-division").select2();
+   // $("#add-division").select2();
 
     function postNote(){
         var string = $("#add-string").val();
         var date = dateToStr(new Date);   
         //var division = $("#add_division option:selected").text();
         var add_division = document.getElementById("add-division");
-        var i = add_division.selectedIndex;
+        var i = add_division.options.selectedIndex;
         var division = add_division.options[i].text;
+        //var division = $("#add-division option:selected").val();
+        display.selectedIndex = i;
         notes.add(new Note(string, date, division, Date.now()));
         //appendNote(notes.lastAdd);
         refresh();
@@ -140,6 +142,8 @@
             this.division = division;
             this.displayedDivisions = {};
             this.sort  = "newest";
+            this.selectedIndex = 0;
+            this.maxNum = 50;
         }
 
         setDisplayTime(){
@@ -271,10 +275,15 @@
 
     function generateDivisionButtons(notes){
         $("#division-select-buttons").empty();
+        var btns = [];
         for(var d in notes.divisions){   
-            var btn = $("<button class='division-select-button square_btn'>"+d+"</button>")
+            console.log(d);
+            btns.push($("<button class='division-select-button square_btn'value='"+d+"'>"+d+"</button>"));
+        }
+        for(var btn of btns){
             btn.click(function(){
-                setAddDivision(d);
+                setAddDivision(this.value);
+                display.selectedIndex = document.getElementById("add-division").options.selectedIndex;
             });
             $("#division-select-buttons").append(btn);
         }
@@ -284,21 +293,23 @@
         $("#add-division").append("<option value='"+division+"'>"+division+"</option>");    
     }
 
-    function generateDivisionSelectOptions(notes){
-        $("#add-division").empty();
-        for(var d in notes.divisions){
-            pushDivisionToOption(d);
-        }
-    }
-
     function setAddDivision(division){
         $("#add-division").val(division);
         $('#add-division').trigger('change');
     }
 
+    function generateDivisionSelectOptions(notes){
+        $("#add-division").empty();
+        for(var d in notes.divisions){
+            pushDivisionToOption(d);
+        }
+        //console.log(document.getElementById("add-division").options[display.selectedIndex].text);
+        setAddDivision(document.getElementById("add-division").options[display.selectedIndex].text);
+    }
+
     function addDivisionFromInput(){
-        var text = document.getElementById("push-division-text").value;
         if(text==="") return;
+        var text = document.getElementById("push-division-text").value;
         if(!notes.divisions[text]){
             notes.divisions[text] = [];
             pushDivisionToOption(text);
@@ -306,6 +317,9 @@
         $("#add-division").val(text);
         $('#add-division').trigger('change');
         document.getElementById("push-division-text").value = "";
+        generateDivisionButtons(notes);
+        writeJson(notes);
+        console.log(notes);
     }
 
     document.getElementById("push-division-text").addEventListener('keydown', function(e){
@@ -417,6 +431,7 @@
         }
 
         for(var i in toDisplay){
+            if(i == display.maxNum) break;
             appendNote(toDisplay[i]);
         }
     }
@@ -477,6 +492,6 @@
     }
 
     //interval
-    setInterval(refresh, 1000);
+    //setInterval(refresh, 1000);
     
 })();
