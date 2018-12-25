@@ -54,7 +54,7 @@
 
     $("#add-division").select2();
 
-    document.getElementById("add-button").addEventListener("click", function(){
+    function postNote(){
         var string = $("#add-string").val();
         var date = dateToStr(new Date);   
         //var division = $("#add_division option:selected").text();
@@ -66,7 +66,12 @@
         console.log(notes);
 
         document.getElementById("add-string").value = "";
+    }
+
+    document.getElementById("add-string").addEventListener("keydown", function(e){
+        if(e.ctrlKey && e.keyCode==13) postNote();
     }, false);
+    document.getElementById("add-button").addEventListener("click", postNote, false);
 
 
     //2. display note from data
@@ -245,7 +250,7 @@
     function generateNavigations(Notes){
         $("#navi-division").empty();
         //link to all
-
+        generateNavigation(null, null, "all");
 
         //each
         display.displayedDivisions = {};
